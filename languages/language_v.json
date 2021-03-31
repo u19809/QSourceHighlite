@@ -1,0 +1,54 @@
+{
+  "language" : "v",
+  "extensions" : [ "v" ],
+  "keywords" : [
+  "break",
+  "const",
+  "continue",
+  "defer",
+  "else",
+  "for",
+  "fn",
+  "go",
+  "goto",
+  "if",
+  "import",
+  "interface",
+  "return",
+  "struct",
+  "switch",
+  "type",
+  "pub",
+  "or",
+  "none"
+  ],
+  "types" : [
+  "map",
+  "struct",
+  "bool",
+  "byte",
+  "f32",
+  "f64",
+  "i8",
+  "i16",
+  "int",
+  "i64",
+  "i128",
+  "string",
+  "u16",
+  "u32",
+  "u64",
+  "u128",
+  "byteptr",
+  "voidptr",
+  "rune"
+  ],
+  "builtin" : [
+  ],
+  "literals" : [
+  "false",
+  "true",
+  ],
+  "other" : [
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "language" : "yaml",
+  "extensions" : [ "yaml" ],
+  "keywords" : [
+  ],
+  "types" : [
+  ],
+  "builtin" : [
+  ],
+  "literals" : [
+  "false",
+  "true",
+  "null",
+  ],
+  "other" : [
+  ]
+}

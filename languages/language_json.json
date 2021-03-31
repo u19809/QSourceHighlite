@@ -1,0 +1,17 @@
+{
+  "language" : "json",
+  "extensions" : [ "json" ],
+  "keywords" : [
+  ],
+  "types" : [
+  ],
+  "builtin" : [
+  ],
+  "literals" : [
+  "false",
+  "true",
+  "null"
+  ],
+  "other" : [
+  ]
+}
