@@ -1,0 +1,86 @@
+{
+  "asm" : {
+   "name" : "asm",
+   "extensions" : [ "asm" ],
+  },
+  "cmake" : {
+   "name" : "cmake",
+   "extensions" : [ ],
+  },
+  "cpp" : {
+   "name" : "cpp",
+   "extensions" : [ "cpp", "cxx", "h", "hpp", "hxx" ]
+  },
+  "c" : {
+   "name" : "cpp",
+   "extensions" : [ "c", "h" ]
+  },
+  "csharp" : {
+   "name" : "csharp",
+   "extensions" : [ "cs" ]
+  },
+  "css" : {
+   "name" : "css",
+   "extensions" : [ "css" ]
+  },
+  "go" : {
+   "name" : "go",
+   "extensions" : [ "go" ],
+  },
+  "java" : {
+   "name" : "java",
+   "extensions" : [ "java" ]
+  },
+  "js" : {
+   "name" : "javascript",
+   "extensions" : [ "js" ]
+  },
+  "json" : {
+   "name" : "json",
+   "extensions" : [ "json" ]
+  },
+  "lua" : {
+   "name" : "lua",
+   "extensions" : [ "lua" ]
+  },
+  "php" : {
+   "name" : "php",
+   "extensions" : [ "php" ]
+  },
+  "py" : {
+   "name" : "python",
+   "extensions" : [ "py" ]
+  },
+  "qml" : {
+   "name" : "qml",
+   "extensions" : [ "qml" ]
+  },
+  "rs" : {
+   "name" : "rust",
+   "extensions" : [ "rs" ]
+  },
+  "sh" : {
+   "name" : "shell",
+   "extensions" : [ "sh" ]
+  },
+  "sql" : {
+   "name" : "sql",
+   "extensions" : [ "sql" ]
+  },
+  "ts" : {
+   "name" : "typescript",
+   "extensions" : [ "ts" ]
+  },
+  "v" : {
+   "name" : "v",
+   "extensions" : [ "v" ]
+  },
+  "vex" : {
+   "name" : "vex",
+   "extensions" : [ "vex" ]
+  },
+  "yaml" : {
+   "name" : "yaml",
+   "extensions" : [ "yaml" ]
+  }
+}

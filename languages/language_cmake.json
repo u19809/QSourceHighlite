@@ -1,6 +1,7 @@
 {
   "language" : "cmake",
   "extensions" : [ ],
+  "comment" : "#",
   "keywords" : [
   "break",
   "cmake_host_system_information",

@@ -1,6 +1,7 @@
 {
   "language" : "py",
   "extensions" : [ "py" ],
+  "comment" : "#",
   "keywords" : [
   "and",
   "elif",

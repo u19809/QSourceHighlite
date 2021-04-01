@@ -1,6 +1,7 @@
 {
   "language" : "asm",
   "extensions" : [ "asm" ],
+  "comment" : "#",
   "keywords" : [
   "lock",
   "rep",

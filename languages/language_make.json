@@ -1,6 +1,7 @@
 {
   "language" : "make",
   "extensions" : [ ],
+  "comment" : "#",
   "keywords" : [
   "include",
   "define",

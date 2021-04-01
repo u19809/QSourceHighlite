@@ -1,6 +1,6 @@
 {
-  "language" : "yaml",
-  "extensions" : [ "yaml" ],
+  "language" : "ini",
+  "extensions" : [ "ini" ],
   "comment" : "#",
   "keywords" : [
   ],
@@ -9,9 +9,6 @@
   "builtin" : [
   ],
   "literals" : [
-  "false",
-  "true",
-  "null",
   ],
   "other" : [
   ]
