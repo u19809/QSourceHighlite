@@ -41,8 +41,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QSourceHighlite::QSourceHighliter *highlighter;
-    static QHash<QString, QSourceHighlite::QSourceHighliter::Language> _langStringToEnum;
+    QSourceHighliter *highlighter;
+    static QHash<QString, QSourceHighliter::Language> _langStringToEnum;
 
     /* FUNCTIONS */
     void initLangsEnum();
