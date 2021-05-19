@@ -1,6 +1,4 @@
 {
-  "language" : "sh",
-  "extensions" : [ "sh" ],
   "comment" : "#",
   "keywords" : [
   "if",

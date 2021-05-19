@@ -1,6 +1,4 @@
 {
-  "language" : "qml",
-  "extensions" : [ "qml" ],
   "keywords" : [
   "default",
   "property",
@@ -98,7 +96,7 @@
   "Component",
   "Button",
   "TextInput",
-  "ListView",
+  "ListView"
   ],
   "builtin" : [
   ],

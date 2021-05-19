@@ -1,6 +1,4 @@
 {
-  "language" : "go",
-  "extensions" : [ "go" ],
   "keywords" : [
   "break",
   "case",
@@ -24,7 +22,7 @@
   "select",
   "struct",
   "switch",
-  "type",
+  "type"
   ],
   "types" : [
   "map",

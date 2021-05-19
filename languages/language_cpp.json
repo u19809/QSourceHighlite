@@ -1,6 +1,4 @@
 {
-  "language" : "cpp",
-  "extensions" : [ "cpp", "cxx", "h", "hpp", "hxx" ],
   "keywords" : [
   "alignas",
   "alignof",

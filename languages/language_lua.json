@@ -1,6 +1,4 @@
 {
-  "language" : "lua",
-  "extensions" : [ "lua" ],
   "keywords" : [
   ],
   "types" : [

@@ -1,6 +1,4 @@
 {
-  "language" : "sql",
-  "extensions" : [ "sql" ],
   "keywords" : [
   "ACTION",
   "ADD",
@@ -333,7 +331,7 @@
   "literals" : [
   "TRUE",
   "FALSE",
-  "NULL",
+  "NULL"
   ],
   "other" : [
   ]

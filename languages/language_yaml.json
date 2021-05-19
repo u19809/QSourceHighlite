@@ -1,6 +1,4 @@
 {
-  "language" : "yaml",
-  "extensions" : [ "yaml" ],
   "comment" : "#",
   "keywords" : [
   ],
@@ -11,7 +9,7 @@
   "literals" : [
   "false",
   "true",
-  "null",
+  "null"
   ],
   "other" : [
   ]

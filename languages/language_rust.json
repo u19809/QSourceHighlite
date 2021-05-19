@@ -1,6 +1,4 @@
 {
-  "language" : "rs",
-  "extensions" : [ "rs" ],
   "keywords" : [
   "abstract",
   "alignof",
@@ -51,7 +49,7 @@
   "virtual",
   "where",
   "while",
-  "yield",
+  "yield"
   ],
   "types" : [
   "union",

@@ -1,6 +1,4 @@
 {
-  "language" : "ini",
-  "extensions" : [ "ini" ],
   "comment" : "#",
   "keywords" : [
   ],

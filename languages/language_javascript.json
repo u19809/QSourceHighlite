@@ -1,6 +1,5 @@
 {
-  "language" : "js",
-  "extensions" : [ "js" ],
+  "multilinestringchar" : "`",
   "keywords" : [
   "in",
   "of",

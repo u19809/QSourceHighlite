@@ -1,6 +1,4 @@
 {
-  "language" : "php",
-  "extensions" : [ "php" ],
   "keywords" : [
   "and",
   "list",
@@ -85,7 +83,6 @@
   "__FUNCTION__",
   "__DIR__",
   "__NAMESPACE__",
-
   "SERVER",
   "GET",
   "POST",

@@ -1,6 +1,4 @@
 {
-  "language" : "vex",
-  "extensions" : [ "vex" ],
   "keywords" : [
   "break",
   "continue",
@@ -36,11 +34,12 @@
   "vector",
   "vector2",
   "vector4",
-  "void",  ],
+  "void"
+  ],
   "literals" : [
   "false",
   "true",
-  "null",
+  "null"
   ],
   "builtin" : [
   "Du",
@@ -699,7 +698,8 @@
   "xnoise",
   "xnoised",
   "xyzdist",
-  "xyztorgb"  ],
+  "xyztorgb"
+  ],
   "other" : [
   "define",
   "else",
@@ -709,6 +709,6 @@
   "ifndef",
   "include",
   "pragma",
-  "undef",
+  "undef"
   ]
 }

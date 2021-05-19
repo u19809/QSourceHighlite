@@ -1,6 +1,4 @@
 {
-  "language" : "py",
-  "extensions" : [ "py" ],
   "comment" : "#",
   "keywords" : [
   "and",
@@ -35,7 +33,7 @@
   "lambda",
   "async",
   "await",
-  "nonlocal",
+  "nonlocal"
   ],
   "types" : [
   ],

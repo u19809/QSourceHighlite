@@ -1,6 +1,4 @@
 {
-  "language" : "make",
-  "extensions" : [ ],
   "comment" : "#",
   "keywords" : [
   "include",
@@ -64,11 +62,11 @@
   ],
   "literals" : [
   "true",
-  "false",
+  "false"
   ],
   "other" : [
   "CFLAGS",
   "LIBS",
-  "PREFIX",
+  "PREFIX"
   ]
 }

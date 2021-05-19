@@ -1,6 +1,4 @@
 {
-  "language" : "java",
-  "extensions" : [ "java" ],
   "keywords" : [
   "abstract",
   "assert",
@@ -66,8 +64,7 @@
   "class",
   "double",
   "enum",
-  "short",
-
+  "short"
   ],
   "builtin" : [
   ],

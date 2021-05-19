@@ -1,6 +1,4 @@
 {
-  "language" : "asm",
-  "extensions" : [ "asm" ],
   "comment" : "#",
   "keywords" : [
   "lock",
@@ -1758,7 +1756,7 @@
   "sha256rnds2",
   "sha256msg1",
   "sha256msg2",
-  "hint_nop",
+  "hint_nop"
   ],
   "types" : [
   "ip",
@@ -2075,6 +2073,6 @@
   "bss"
   ],
   "other" : [
-  "section",
+  "section"
   ]
 }

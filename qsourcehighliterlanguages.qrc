@@ -1,2 +1,27 @@
-<!DOCTYPE RCC>
-<RCC version="1.0"/>
+<RCC>
+    <qresource prefix="/">
+        <file>languages/language_cpp.json</file>
+        <file>languages/language_asm.json</file>
+        <file>languages/language_cmake.json</file>
+        <file>languages/language_csharp.json</file>
+        <file>languages/language_css.json</file>
+        <file>languages/language_go.json</file>
+        <file>languages/language_ini.json</file>
+        <file>languages/language_java.json</file>
+        <file>languages/language_javascript.json</file>
+        <file>languages/language_json.json</file>
+        <file>languages/language_lua.json</file>
+        <file>languages/language_make.json</file>
+        <file>languages/language_php.json</file>
+        <file>languages/language_python.json</file>
+        <file>languages/language_qml.json</file>
+        <file>languages/language_rust.json</file>
+        <file>languages/language_shell.json</file>
+        <file>languages/language_sql.json</file>
+        <file>languages/language_typescript.json</file>
+        <file>languages/language_v.json</file>
+        <file>languages/language_vex.json</file>
+        <file>languages/language_yaml.json</file>
+        <file>languages/languages.json</file>
+    </qresource>
+</RCC>

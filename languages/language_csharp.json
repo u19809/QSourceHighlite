@@ -1,6 +1,4 @@
 {
-  "language" : "csharp",
-  "extensions" : [ "cs" ],
   "keywords" : [
   "abstract",
   "add",
@@ -100,7 +98,7 @@
   "ulong",
   "ushort",
   "var",
-  "void",
+  "void"
   ],
   "builtin" : [
   ],
