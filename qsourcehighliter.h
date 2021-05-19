@@ -25,7 +25,7 @@
 
 #include <QSyntaxHighlighter>
 
-class ALanguage;
+struct ALanguage;
 class LanguageDB;
 
 class QSourceHighliter : public QSyntaxHighlighter
