@@ -21,11 +21,10 @@
  *
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
-#include <qsourcehighliter.h>
+#include <qsourcehighlighter.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -41,8 +40,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QSourceHighliter *highlighter;
-    static QHash<QString, QSourceHighliter::Language> _langStringToEnum;
+    QSourceHighlighter *highlighter;
+    static QHash<QString, QSourceHighlighter::Language> _langStringToEnum;
 
     /* FUNCTIONS */
     void initLangsEnum();

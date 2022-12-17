@@ -21,9 +21,9 @@
  *
  */
 
-#include "qsourcehighliterthemes.h"
+#include "qsourcehighlighterthemes.h"
 
-namespace QSourceHighlite {
+namespace QSourceHighlighter {
 
 
 }

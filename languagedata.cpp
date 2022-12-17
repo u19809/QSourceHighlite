@@ -55,7 +55,7 @@ void ALanguage::load()
 
     if ( !F.open( QIODevice::ReadOnly ) )
     {
-        qWarning() << "Error loading sourcehighliter syntax file" << F.fileName() << F.errorString();
+        qWarning() << "Error loading sourcehighlighter syntax file" << F.fileName() << F.errorString();
         return;
     }
 
@@ -65,7 +65,7 @@ void ALanguage::load()
 
     if ( Err.error != QJsonParseError::NoError )
     {
-        qWarning() << "Error loading sourcehighliter syntax file" << F.fileName() << Err.errorString() << "near" << QString::fromUtf8( FF ).mid( qMax( 0, Err.offset - 10 ), 30 );
+        qWarning() << "Error loading sourcehighlighter syntax file" << F.fileName() << Err.errorString() << "near" << QString::fromUtf8( FF ).mid( qMax( 0, Err.offset - 10 ), 30 );
         return;
     }
 
@@ -100,7 +100,7 @@ LanguageDB::LanguageDB()
 
     if ( Err.error != QJsonParseError::NoError )
     {
-        qCritical() << "Error loading sourcehighliter file" << F.fileName() << Err.errorString() << "near" << QString::fromUtf8( FF ).mid( qMax( 0, Err.offset - 10 ), 30 );
+        qCritical() << "Error loading sourcehighlighter file" << F.fileName() << Err.errorString() << "near" << QString::fromUtf8( FF ).mid( qMax( 0, Err.offset - 10 ), 30 );
         Q_ASSERT( false );
     }
 

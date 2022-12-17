@@ -21,14 +21,11 @@
  *
  */
 
-#ifndef QSOURCEHIGHLITERTHEMES_H
-#define QSOURCEHIGHLITERTHEMES_H
+#pragma once
 
-#include "qsourcehighliter.h"
+#include "qsourcehighlighter.h"
 
-namespace QSourceHighliterTheme
-{
+#include <QTextCharFormat>
 
-} // namespace QSourceHighliterTheme
-
-#endif // QSOURCEHIGHLITERTHEMES_H
+class QSourceHighlighterTheme : public QHash<QSourceHighlighter::Token, QTextCharFormat>
+{} // namespace QSourceHighlighterTheme

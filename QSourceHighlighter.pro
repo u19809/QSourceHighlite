@@ -1,6 +1,6 @@
 QT       += core gui
 
-include(QSourceHighlite.pri)
+include(QSourceHighlighter.pri)
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

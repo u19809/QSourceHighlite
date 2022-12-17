@@ -23,22 +23,26 @@
 
 #pragma once
 
+#include <QMap>
 #include <QSyntaxHighlighter>
+#include <QtCore/QtGlobal>
+#if Q_VERSION_MAJOR >= 6
+#include <QStringView>
+#endif
 
 struct ALanguage;
 class LanguageDB;
+class QSettings;
 
-class QSourceHighliter : public QSyntaxHighlighter
+#if defined(QSOURCEHIGHLIGHTER_LIBRARY)
+#define QSOURCEHIGHLIGHTER_EXPORT Q_DECL_EXPORT
+#else
+#define QSOURCEHIGHLIGHTER_EXPORT Q_DECL_IMPORT
+#endif
+
+class QSOURCEHIGHLIGHTER_EXPORT QSourceHighlighter : public QSyntaxHighlighter
 {
-    public:
-    enum Themes
-    {
-        Monokai = 1
-    };
-
-    explicit QSourceHighliter(QTextDocument *doc);
-    QSourceHighliter( QTextDocument* doc, Themes theme );
-
+public:
     enum Token {
         CodeBlock,
         CodeKeyWord,
@@ -49,20 +53,43 @@ class QSourceHighliter : public QSyntaxHighlighter
         CodeNumLiteral,
         CodeBuiltIn,
     };
-    Q_ENUM( Token )
+    Q_ENUM(Token)
 
-    bool                      setCurrentLanguage( const QString& language );
+    class Theme : public QHash<Token, QTextCharFormat>
+    {
+    public:
+        Theme() {}
+#if Q_VERSION_MAJOR >= 6
+        Theme(QSettings *S, QStringView Key);
+#else
+        Theme(QSettings *S, const QString &Key);
+#endif
+        static const QMap<QString, Token> &colors();
+    };
+
+    explicit QSourceHighlighter(QTextDocument *doc);
+    QSourceHighlighter(QTextDocument *doc, const QString &theme);
+
+    bool setCurrentLanguage(const QString &language);
     bool                      setCurrentLanguageByExtension( const QString& extension );
     Q_REQUIRED_RESULT QString currentLanguage();
-    void                      setTheme( Themes theme );
+#if Q_VERSION_MAJOR >= 6
+    void applyTheme(QStringView themeName);
+    void addTheme(QStringView themeName, const Theme &theme);
+    Theme getTheme(QStringView themeName);
+#else
+    void applyTheme(const QString &themeName);
+    void addTheme(const QString &themeName, const Theme &theme);
+    Theme getTheme(const QString &themeName);
+#endif
 
-    protected:
-    void highlightBlock( const QString& text ) override;
+protected:
+    void highlightBlock(const QString &text) override;
 
-    private:
-    void                  highlightSyntax( const QString& text );
+private:
+    void highlightSyntax(const QString &text);
     Q_REQUIRED_RESULT int highlightNumericLiterals( const QString& text, int i );
-    Q_REQUIRED_RESULT int highlightStringLiterals( const QChar strType, const QString& text, int i );
+    Q_REQUIRED_RESULT int highlightStringLiterals(const QChar strType, const QString &text, int i);
 
     /**
      * @brief returns true if c is octal
@@ -71,7 +98,7 @@ class QSourceHighliter : public QSyntaxHighlighter
      */
     Q_REQUIRED_RESULT static constexpr inline bool isOctal( const QChar c )
     {
-        return ( c >= '0' && c <= '7' );
+        return (c >= '0' && c <= '7');
     }
 
     /**
@@ -81,25 +108,32 @@ class QSourceHighliter : public QSyntaxHighlighter
      */
     Q_REQUIRED_RESULT static constexpr inline bool isHex( const QChar c )
     {
-        return (
-            (c >= '0' && c <= '9') ||
-            (c >= 'a' && c <= 'f') ||
-            (c >= 'A' && c <= 'F')
-        );
+        return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'));
     }
 
-    void cssHighlighter(const QString &text);
-    void ymlHighlighter(const QString &text);
-    void xmlHighlighter(const QString &text);
-    void makeHighlighter(const QString &text);
-    void highlightInlineAsmLabels(const QString& text);
-    void asmHighlighter(const QString& text);
-    void initFormats();
+#if QT_VERSION_MAJOR >= 6
+    typedef QStringView TextValue;
+    typedef QStringView TextBuffer;
+    typedef QStringView TextRef;
+#define MIDREF mid
+#else
+    typedef const QString &TextValue;
+    typedef const QString TextBuffer;
+    typedef const QStringRef TextRef;
+#define MIDREF midRef
+#endif
+    void cssHighlighter(TextValue text);
+    void ymlHighlighter(TextValue text);
+    void xmlHighlighter(TextValue text);
+    void makeHighlighter(TextValue text);
+    void highlightInlineAsmLabels(TextValue text);
+    void asmHighlighter(TextValue text);
 
-    QHash<Token, QTextCharFormat> _formats;
+    Theme _theme;
     QChar                                             MultilineStringChar;
     ALanguage*                                        _language;
-    QHash< QSourceHighliter::Token, QTextCharFormat > theme( Themes theme );
+
+    static QMap<QString, Theme> Themes;
     int                                               CppID;
     int                                               AsmID;
     int                                               CSSID;

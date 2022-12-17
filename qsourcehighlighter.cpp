@@ -21,24 +21,25 @@
  *
  */
 
-#include "qsourcehighliter.h"
+#include "qsourcehighlighter.h"
 #include "languagedata.h"
-#include "qsourcehighliterthemes.h"
 
 #include <QDebug>
+#include <QSettings>
 #include <QTextDocument>
 #include <algorithm>
 
+QMap<QString, QSourceHighlighter::Theme> QSourceHighlighter::Themes;
 static LanguageDB* AllLanguages = nullptr;
 
-QSourceHighliter::QSourceHighliter( QTextDocument* doc )
+QSourceHighlighter::QSourceHighlighter( QTextDocument* doc )
     : QSyntaxHighlighter( doc )
     , _language( nullptr )
 {
     if ( AllLanguages == nullptr )
     {
 
-        Q_INIT_RESOURCE( qsourcehighliterlanguages );
+        Q_INIT_RESOURCE( qsourcehighlighterlanguages );
 
         AllLanguages = new LanguageDB();
         // fetch default language
@@ -58,55 +59,16 @@ QSourceHighliter::QSourceHighliter( QTextDocument* doc )
         CSSID        = ( L ) ? L->id : -1;
     }
 
-    initFormats();
+    applyTheme("");
 }
 
-QSourceHighliter::QSourceHighliter( QTextDocument* doc, QSourceHighliter::Themes theme )
-    : QSyntaxHighlighter( doc )
+QSourceHighlighter::QSourceHighlighter(QTextDocument *doc, const QString &theme)
+    : QSyntaxHighlighter(doc)
 {
-    setTheme( theme );
+    applyTheme(theme);
 }
 
-void QSourceHighliter::initFormats()
-{
-    /****************************************
-     * Formats for syntax highlighting
-     ***************************************/
-
-    QTextCharFormat format = QTextCharFormat();
-
-    _formats[ Token::CodeBlock ] = format;
-    format                       = QTextCharFormat();
-
-    format.setForeground( QColor( 0xF92672 ) );
-    _formats[ Token::CodeKeyWord ] = format;
-    format                         = QTextCharFormat();
-
-    format.setForeground( QColor( 0xa39b4e ) );
-    _formats[ Token::CodeString ] = format;
-    format                        = QTextCharFormat();
-
-    format.setForeground( QColor( 0x75715E ) );
-    _formats[ Token::CodeComment ] = format;
-    format                         = QTextCharFormat();
-
-    format.setForeground( QColor( 0x54aebf ) );
-    _formats[ Token::CodeType ] = format;
-
-    format = QTextCharFormat();
-    format.setForeground( QColor( 0xdb8744 ) );
-    _formats[ Token::CodeOther ] = format;
-
-    format = QTextCharFormat();
-    format.setForeground( QColor( 0xAE81FF ) );
-    _formats[ Token::CodeNumLiteral ] = format;
-
-    format = QTextCharFormat();
-    format.setForeground( QColor( 0x018a0f ) );
-    _formats[ Token::CodeBuiltIn ] = format;
-}
-
-bool QSourceHighliter::setCurrentLanguage( const QString& language )
+bool QSourceHighlighter::setCurrentLanguage(const QString &language)
 {
     if ( _language == nullptr || _language->name != language )
     {
@@ -116,7 +78,7 @@ bool QSourceHighliter::setCurrentLanguage( const QString& language )
     return _language != nullptr;
 }
 
-bool QSourceHighliter::setCurrentLanguageByExtension( const QString& ext )
+bool QSourceHighlighter::setCurrentLanguageByExtension( const QString& ext )
 {
     ALanguage* L = AllLanguages->languageByExtension( ext );
     if ( L )
@@ -130,18 +92,12 @@ bool QSourceHighliter::setCurrentLanguageByExtension( const QString& ext )
     return _language != nullptr;
 }
 
-QString QSourceHighliter::currentLanguage()
+QString QSourceHighlighter::currentLanguage()
 {
     return ( _language != nullptr ) ? _language->name : "";
 }
 
-void QSourceHighliter::setTheme( QSourceHighliter::Themes t )
-{
-    _formats = theme( t );
-    rehighlight();
-}
-
-void QSourceHighliter::highlightBlock( const QString& text )
+void QSourceHighlighter::highlightBlock( const QString& text )
 {
     if ( _language == nullptr )
     {
@@ -167,7 +123,7 @@ void QSourceHighliter::highlightBlock( const QString& text )
  * @brief Does the code syntax highlighting
  * @param text
  */
-void QSourceHighliter::highlightSyntax( const QString& text )
+void QSourceHighlighter::highlightSyntax( const QString& text )
 {
     if ( text.isEmpty() )
         return;
@@ -191,7 +147,7 @@ void QSourceHighliter::highlightSyntax( const QString& text )
     // this statement is very slow
     // TODO: do this formatting when necessary instead of
     // applying it to the whole block in the beginning
-    setFormat( 0, textLen, _formats[ CodeBlock ] );
+    setFormat(0, textLen, _theme[CodeBlock]);
 
     QStringView ROText( text );
 
@@ -218,12 +174,12 @@ void QSourceHighliter::highlightSyntax( const QString& text )
         return i;
     };
 
-    const QTextCharFormat& formatType    = _formats[ CodeType ];
-    const QTextCharFormat& formatKeyword = _formats[ CodeKeyWord ];
-    const QTextCharFormat& formatComment = _formats[ CodeComment ];
-    const QTextCharFormat& formatNumLit  = _formats[ CodeNumLiteral ];
-    const QTextCharFormat& formatBuiltIn = _formats[ CodeBuiltIn ];
-    const QTextCharFormat& formatOther   = _formats[ CodeOther ];
+    const QTextCharFormat &formatType = _theme[CodeType];
+    const QTextCharFormat &formatKeyword = _theme[CodeKeyWord];
+    const QTextCharFormat &formatComment = _theme[CodeComment];
+    const QTextCharFormat &formatNumLit = _theme[CodeNumLiteral];
+    const QTextCharFormat &formatBuiltIn = _theme[CodeBuiltIn];
+    const QTextCharFormat &formatOther = _theme[CodeOther];
 
     for ( int i = 0; i < textLen; ++i )
     {
@@ -294,11 +250,11 @@ void QSourceHighliter::highlightSyntax( const QString& text )
             {
                 setFormat( i, textLen, formatComment );
                 i = textLen;
-                //integer literal
+                //integer lighteral
             } else if ( text[ i ].isNumber() )
             {
                 i = highlightNumericLiterals( text, i );
-                //string literals
+                //string lighterals
             } else if ( text[ i ] == QChar( '\"' ) )
             {
                 i = highlightStringLiterals( '\"', text, i );
@@ -338,7 +294,7 @@ void QSourceHighliter::highlightSyntax( const QString& text )
         if (i == textLen || !text[i].isLetter()) continue;
 
         /* Highlight Literals (true/false/NULL,nullptr) */
-        i = applyCodeFormat( i, _language->literals, text, formatNumLit );
+        i = applyCodeFormat(i, _language->literals, text, formatNumLit);
         if (i == textLen || !text[i].isLetter()) continue;
 
         /* Highlight Builtin library stuff */
@@ -394,15 +350,15 @@ void QSourceHighliter::highlightSyntax( const QString& text )
 }
 
 /**
- * @brief Highlight string literals in code
+ * @brief Highlight string lighterals in code
  * @param strType str type i.e., ' or "
  * @param text the text being scanned
  * @param i pos of i in loop
  * @return pos of i after the string
  */
-int QSourceHighliter::highlightStringLiterals(const QChar strType, const QString &text, int i) {
+int QSourceHighlighter::highlightStringLiterals(const QChar strType, const QString &text, int i) {
     bool stringClosed = false;
-    setFormat(i, 1,  _formats[CodeString]);
+    setFormat(i, 1, _theme[CodeString]);
     ++i;
 
     while (i < text.length()) {
@@ -410,7 +366,7 @@ int QSourceHighliter::highlightStringLiterals(const QChar strType, const QString
         //make sure it's not an escape seq
         if ( text.at( i ) == strType && text.at( i - 1 ) != QChar( '\\' ) )
         {
-            setFormat(i, 1,  _formats[CodeString]);
+            setFormat(i, 1, _theme[CodeString]);
             ++i;
             stringClosed = true;
             break;
@@ -483,16 +439,16 @@ int QSourceHighliter::highlightStringLiterals(const QChar strType, const QString
             //if len is zero, that means this wasn't an esc seq
             //increment i so that we skip this backslash
             if (len == 0) {
-                setFormat(i, 1,  _formats[CodeString]);
-                ++i;
-                continue;
+                    setFormat(i, 1, _theme[CodeString]);
+                    ++i;
+                    continue;
             }
 
-            setFormat(i, len, _formats[CodeNumLiteral]);
+            setFormat(i, len, _theme[CodeNumLiteral]);
             i += len;
             continue;
         }
-        setFormat(i, 1,  _formats[CodeString]);
+        setFormat(i, 1, _theme[CodeString]);
         ++i;
     }
 
@@ -501,12 +457,12 @@ int QSourceHighliter::highlightStringLiterals(const QChar strType, const QString
 }
 
 /**
- * @brief Highlight number literals in code
+ * @brief Highlight number lighterals in code
  * @param text the text being scanned
  * @param i pos of i in loop
  * @return pos of i after the number
  */
-int QSourceHighliter::highlightNumericLiterals(const QString &text, int i)
+int QSourceHighlighter::highlightNumericLiterals(const QString &text, int i)
 {
     bool isPreAllowed = false;
     if (i == 0) isPreAllowed = true;
@@ -546,7 +502,7 @@ int QSourceHighliter::highlightNumericLiterals(const QString &text, int i)
     const int start = i;
 
     if ((i+1) >= text.length()) {
-        setFormat(i, 1, _formats[CodeNumLiteral]);
+        setFormat(i, 1, _theme[CodeNumLiteral]);
         return ++i;
     }
 
@@ -620,7 +576,7 @@ int QSourceHighliter::highlightNumericLiterals(const QString &text, int i)
     }
     if (isPostAllowed) {
         int end = i;
-        setFormat(start, end - start, _formats[CodeNumLiteral]);
+        setFormat(start, end - start, _theme[CodeNumLiteral]);
     }
     //decrement so that the index is at the last number, not after it
     return --i;
@@ -643,8 +599,10 @@ int QSourceHighliter::highlightNumericLiterals(const QString &text, int i)
  * If an h letter is found, check the next 4/5 letters for http/https and
  * highlight them as a link (underlined)
  */
-void QSourceHighliter::ymlHighlighter(const QString &text) {
-    if (text.isEmpty()) return;
+void QSourceHighlighter::ymlHighlighter(TextValue text)
+{
+    if (text.isEmpty())
+        return;
     const auto textLen = text.length();
     bool colonNotFound = false;
 
@@ -658,7 +616,7 @@ void QSourceHighliter::ymlHighlighter(const QString &text) {
         if ( colonNotFound && text.at( i ) != QChar( 'h' ) )
             continue;
 
-        //we found a string literal, skip it
+        //we found a string lighteral, skip it
         if ( i != 0 && ( text.at( i - 1 ) == QChar( '"' ) || text.at( i - 1 ) == QChar( '\'' ) ) )
         {
             const int next = text.indexOf(text.at(i-1), i);
@@ -674,26 +632,25 @@ void QSourceHighliter::ymlHighlighter(const QString &text) {
 
         if (!colonNotFound) {
             //if the line ends here, format and return
-            if (colon+1 == textLen) {
-                setFormat(i, colon - i, _formats[CodeKeyWord]);
-                return;
+            if (colon + 1 == textLen) {
+                    setFormat(i, colon - i, _theme[CodeKeyWord]);
+                    return;
             } else {
-                //colon is found, check if it isn't some path or something else
-                if ( !( text.at( colon + 1 ) == QChar( '\\' ) && text.at( colon + 1 ) == QChar( '/' ) ) )
-                {
-                    setFormat(i, colon - i, _formats[CodeKeyWord]);
-                }
+                    //colon is found, check if it isn't some path or something else
+                    if (!(text.at(colon + 1) == QChar('\\') && text.at(colon + 1) == QChar('/'))) {
+                        setFormat(i, colon - i, _theme[CodeKeyWord]);
+                    }
             }
         }
 
         //underlined links
         if ( text.at( i ) == QChar( 'h' ) )
         {
-            if ( text.midRef( i, 5 ) == QStringLiteral( "https" ) || text.midRef( i, 4 ) == QStringLiteral( "http" ) )
-            {
+            if (text.MIDREF(i, 5) == QStringLiteral("https")
+                || text.MIDREF(i, 4) == QStringLiteral("http")) {
                 int space = text.indexOf(QChar(' '), i);
                 if (space == -1) space = textLen;
-                QTextCharFormat f = _formats[CodeString];
+                QTextCharFormat f = _theme[CodeString];
                 f.setUnderlineStyle(QTextCharFormat::SingleUnderline);
                 setFormat(i, space - i, f);
                 i = space;
@@ -702,7 +659,7 @@ void QSourceHighliter::ymlHighlighter(const QString &text) {
     }
 }
 
-void QSourceHighliter::cssHighlighter(const QString &text)
+void QSourceHighlighter::cssHighlighter(TextValue text)
 {
     if (text.isEmpty()) return;
     const auto textLen = text.length();
@@ -718,12 +675,11 @@ void QSourceHighliter::cssHighlighter(const QString &text)
                     space = textLen;
                 }
             }
-            setFormat(i, space - i, _formats[CodeKeyWord]);
+            setFormat(i, space - i, _theme[CodeKeyWord]);
             i = space;
         } else if ( text[ i ] == QChar( 'c' ) )
         {
-            if ( text.midRef( i, 5 ) == QStringLiteral( "color" ) )
-            {
+            if (text.mid(i, 5) == QStringLiteral("color")) {
                 i += 5;
                 int colon = text.indexOf( QChar( ':' ), i );
                 if (colon < 0) continue;
@@ -734,9 +690,10 @@ void QSourceHighliter::cssHighlighter(const QString &text)
                     i++;
                 }
                 int semicolon = text.indexOf( QChar( ';' ) );
-                if (semicolon < 0) semicolon = textLen;
-                const QString color = text.mid(i, semicolon-i);
-                QTextCharFormat f = _formats[CodeBlock];
+                if (semicolon < 0)
+                    semicolon = textLen;
+                TextBuffer color = text.mid(i, semicolon - i);
+                QTextCharFormat f = _theme[CodeBlock];
                 QColor c(color);
                 if ( color.startsWith( QStringLiteral( "rgb" ) ) )
                 {
@@ -745,12 +702,12 @@ void QSourceHighliter::cssHighlighter(const QString &text)
                     int gPos = text.indexOf( QChar( ',' ), rPos + 1 );
                     int bPos = text.indexOf( QChar( ')' ), gPos );
                     if (rPos > -1 && gPos > -1 && bPos > -1) {
-                        const QStringRef r = text.midRef(t+1, rPos - (t+1));
-                        const QStringRef g = text.midRef(rPos+1, gPos - (rPos + 1));
-                        const QStringRef b = text.midRef(gPos+1, bPos - (gPos+1));
-                        c.setRgb(r.toInt(), g.toInt(), b.toInt());
+                            TextRef r = text.MIDREF(t + 1, rPos - (t + 1));
+                            TextRef g = text.MIDREF(rPos + 1, gPos - (rPos + 1));
+                            TextRef b = text.MIDREF(gPos + 1, bPos - (gPos + 1));
+                            c.setRgb(r.toInt(), g.toInt(), b.toInt());
                     } else {
-                        c = _formats[CodeBlock].background().color();
+                            c = _theme[CodeBlock].background().color();
                     }
                 }
 
@@ -788,12 +745,12 @@ void QSourceHighliter::cssHighlighter(const QString &text)
     }
 }
 
-
-void QSourceHighliter::xmlHighlighter(const QString &text) {
+void QSourceHighlighter::xmlHighlighter(TextValue text)
+{
     if (text.isEmpty()) return;
     const auto textLen = text.length();
 
-    setFormat(0, textLen, _formats[CodeBlock]);
+    setFormat(0, textLen, _theme[CodeBlock]);
 
     for (int i = 0; i < textLen; ++i) {
         if ( text[ i ] == QChar( '<' ) && text[ i + 1 ] != QChar( '!' ) )
@@ -804,7 +761,7 @@ void QSourceHighliter::xmlHighlighter(const QString &text) {
                 ++i;
                 if ( text[ i ] == QChar( '/' ) )
                     ++i;
-                setFormat(i, found - i, _formats[CodeKeyWord]);
+                setFormat(i, found - i, _theme[CodeKeyWord]);
             }
         }
 
@@ -814,7 +771,7 @@ void QSourceHighliter::xmlHighlighter(const QString &text) {
             if ( lastSpace == i - 1 )
                 lastSpace = text.lastIndexOf( QChar( ' ' ), i - 2 );
             if (lastSpace > 0) {
-                setFormat(lastSpace, i - lastSpace, _formats[CodeBuiltIn]);
+                setFormat(lastSpace, i - lastSpace, _theme[CodeBuiltIn]);
             }
         }
 
@@ -839,24 +796,24 @@ void QSourceHighliter::xmlHighlighter(const QString &text) {
                     break;
                 }
             }
-            setFormat(pos, cnt, _formats[CodeString]);
+            setFormat(pos, cnt, _theme[CodeString]);
         }
     }
 }
 
-void QSourceHighliter::makeHighlighter(const QString &text)
+void QSourceHighlighter::makeHighlighter(TextValue text)
 {
     int colonPos = text.indexOf( QChar( ':' ) );
     if (colonPos == -1)
         return;
-    setFormat(0, colonPos, _formats[Token::CodeBuiltIn]);
+    setFormat(0, colonPos, _theme[Token::CodeBuiltIn]);
 }
 
 /**
  * @brief highlight inline labels such as 'func()' in "call func()"
  * @param text
  */
-void QSourceHighliter::highlightInlineAsmLabels(const QString &text)
+void QSourceHighlighter::highlightInlineAsmLabels(TextValue text)
 {
 #define Q(s) QStringLiteral(s)
     static const QString jumps[27] = {
@@ -870,10 +827,10 @@ void QSourceHighliter::highlightInlineAsmLabels(const QString &text)
     };
 #undef Q
 
-    auto format = _formats[Token::CodeBuiltIn];
+    auto format = _theme[Token::CodeBuiltIn];
     format.setFontUnderline(true);
 
-    const QString trimmed = text.trimmed();
+    TextBuffer trimmed = text.trimmed();
     int start = -1;
     int end = -1;
     QChar         c;
@@ -906,7 +863,7 @@ void QSourceHighliter::highlightInlineAsmLabels(const QString &text)
     }
 }
 
-void QSourceHighliter::asmHighlighter(const QString& text)
+void QSourceHighlighter::asmHighlighter(TextValue text)
 {
     highlightInlineAsmLabels(text);
     //label highlighting
@@ -929,7 +886,7 @@ void QSourceHighliter::asmHighlighter(const QString& text)
         colonPos = text.lastIndexOf(':', commentPos);
     }
 
-    auto format = _formats[Token::CodeBuiltIn];
+    auto format = _theme[Token::CodeBuiltIn];
     format.setFontUnderline(true);
 
     if (colonPos >= text.length() - 1) {
@@ -949,40 +906,87 @@ void QSourceHighliter::asmHighlighter(const QString& text)
         setFormat(0, colonPos, format);
 }
 
-QHash< QSourceHighliter::Token, QTextCharFormat > QSourceHighliter::theme( Themes theme )
+#if Q_VERSION_MAJOR >= 6
+void QSourceHighlighter::applyTheme(QStringView themeName)
+#else
+void QSourceHighlighter::applyTheme(const QString &themeName)
+#endif
 {
-    static QHash< QSourceHighliter::Token, QTextCharFormat > defaultFormat;
-    static QHash< QSourceHighliter::Token, QTextCharFormat > monokaiFormat;
+    _theme = getTheme(themeName);
+    rehighlight();
+}
 
-    if ( defaultFormat.isEmpty() )
-    {
+#if Q_VERSION_MAJOR >= 6
+void QSourceHighlighter::addTheme(QStringView themeName, const Theme &theme)
+#else
+void QSourceHighlighter::addTheme(const QString &themeName, const Theme &theme)
+#endif
+{
+    Themes[themeName] = theme;
+}
 
-        QTextCharFormat defaultTextFormat = QTextCharFormat();
+#if Q_VERSION_MAJOR >= 6
+QSourceHighlighter::Theme QSourceHighlighter::getTheme(QStringView themeName)
+#else
+QSourceHighlighter::Theme QSourceHighlighter::getTheme(const QString &themeName)
+#endif
+{
+    if (Themes.isEmpty()) {
+        {
+            Theme T;
+            T[QSourceHighlighter::Token::CodeBlock] = QTextCharFormat();
+            T[QSourceHighlighter::Token::CodeKeyWord].setForeground(QColor(0xF92672));
+            T[QSourceHighlighter::Token::CodeString].setForeground(QColor(0xa39b4e));
+            T[QSourceHighlighter::Token::CodeComment].setForeground(QColor(0x75715E));
+            T[QSourceHighlighter::Token::CodeType].setForeground(QColor(0x54aebf));
+            T[QSourceHighlighter::Token::CodeOther].setForeground(QColor(0xdb8744));
+            T[QSourceHighlighter::Token::CodeNumLiteral].setForeground(QColor(0xAE81FF));
+            T[QSourceHighlighter::Token::CodeBuiltIn].setForeground(QColor(0x018a0f));
+            addTheme("", T);
+        }
 
-        defaultFormat[ QSourceHighliter::Token::CodeBlock ]      = defaultTextFormat;
-        defaultFormat[ QSourceHighliter::Token::CodeKeyWord ]    = defaultTextFormat;
-        defaultFormat[ QSourceHighliter::Token::CodeString ]     = defaultTextFormat;
-        defaultFormat[ QSourceHighliter::Token::CodeComment ]    = defaultTextFormat;
-        defaultFormat[ QSourceHighliter::Token::CodeType ]       = defaultTextFormat;
-        defaultFormat[ QSourceHighliter::Token::CodeOther ]      = defaultTextFormat;
-        defaultFormat[ QSourceHighliter::Token::CodeNumLiteral ] = defaultTextFormat;
-        defaultFormat[ QSourceHighliter::Token::CodeBuiltIn ]    = defaultTextFormat;
-
-        monokaiFormat[ QSourceHighliter::Token::CodeBlock ].setForeground( QColor( 227, 226, 214 ) );
-        monokaiFormat[ QSourceHighliter::Token::CodeKeyWord ].setForeground( QColor( 249, 38, 114 ) );
-        monokaiFormat[ QSourceHighliter::Token::CodeString ].setForeground( QColor( 230, 219, 116 ) );
-        monokaiFormat[ QSourceHighliter::Token::CodeComment ].setForeground( QColor( 117, 113, 94 ) );
-        monokaiFormat[ QSourceHighliter::Token::CodeType ].setForeground( QColor( 102, 217, 239 ) );
-        monokaiFormat[ QSourceHighliter::Token::CodeOther ].setForeground( QColor( 249, 38, 114 ) );
-        monokaiFormat[ QSourceHighliter::Token::CodeNumLiteral ].setForeground( QColor( 174, 129, 255 ) );
-        monokaiFormat[ QSourceHighliter::Token::CodeBuiltIn ].setForeground( QColor( 166, 226, 46 ) );
+        {
+            Theme T;
+            T[QSourceHighlighter::Token::CodeBlock].setForeground(QColor(227, 226, 214));
+            T[QSourceHighlighter::Token::CodeKeyWord].setForeground(QColor(249, 38, 114));
+            T[QSourceHighlighter::Token::CodeString].setForeground(QColor(230, 219, 116));
+            T[QSourceHighlighter::Token::CodeComment].setForeground(QColor(117, 113, 94));
+            T[QSourceHighlighter::Token::CodeType].setForeground(QColor(102, 217, 239));
+            T[QSourceHighlighter::Token::CodeOther].setForeground(QColor(249, 38, 114));
+            T[QSourceHighlighter::Token::CodeNumLiteral].setForeground(QColor(174, 129, 255));
+            T[QSourceHighlighter::Token::CodeBuiltIn].setForeground(QColor(166, 226, 46));
+            addTheme("monokai", T);
+        }
     }
 
-    switch ( theme )
-    {
-        case Themes::Monokai:
-            return monokaiFormat;
-    }
+    Theme T = Themes.value(themeName);
+    return (T.isEmpty()) ? getTheme("") : T;
+}
 
-    return defaultFormat;
+#if Q_VERSION_MAJOR >= 6
+QSourceHighlighter::Theme::Theme(QSettings *S, QStringView Key)
+#else
+QSourceHighlighter::Theme::Theme(QSettings *S, const QString &Key)
+#endif
+{
+    S->beginGroup(Key);
+    QMapIterator<QString, Token> MI(colors());
+    while (MI.hasNext()) {
+        MI.next();
+        (*this)[MI.value()].setForeground(S->value(MI.key()).value<QColor>());
+    }
+    S->endGroup();
+}
+
+const QMap<QString, QSourceHighlighter::Token> &QSourceHighlighter::Theme::colors()
+{
+    static QMap<QString, QSourceHighlighter::Token> C{{"block", QSourceHighlighter::CodeBlock},
+                                                    {"keyword", QSourceHighlighter::CodeKeyWord},
+                                                    {"string", QSourceHighlighter::CodeString},
+                                                    {"comment", QSourceHighlighter::CodeComment},
+                                                    {"type", QSourceHighlighter::CodeType},
+                                                    {"other", QSourceHighlighter::CodeOther},
+                                                    {"numlighteral", QSourceHighlighter::CodeNumLiteral},
+                                                    {"builtin", QSourceHighlighter::CodeBuiltIn}};
+    return C;
 }

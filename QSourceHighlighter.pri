@@ -1,15 +1,13 @@
 QT += gui
 
-HEADERS += $$PWD/qsourcehighliter.h \
+HEADERS += $$PWD/qsourcehighlighter.h \
            $$PWD/languages/language_others.json.autosave \
-           $$PWD/qsourcehighliterthemes.h \
            $$PWD/languagedata.h
 
-SOURCES += $$PWD/qsourcehighliter.cpp \
-    $$PWD/languagedata.cpp \
-    $$PWD/qsourcehighliterthemes.cpp
+SOURCES += $$PWD/qsourcehighlighter.cpp \
+    $$PWD/languagedata.cpp
 
-RESOURCES += $$PWD/qsourcehighliterlanguages.qrc
+RESOURCES += $$PWD/qsourcehighlighterlanguages.qrc
 
 DISTFILES += $$files( $$PWD/languages/*.json)
 
